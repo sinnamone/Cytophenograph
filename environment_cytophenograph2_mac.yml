@@ -12,7 +12,6 @@
    - conda-forge::openpyxl
  ## bioconda packages
    - bioconda::scanpy
-   - bioconda::cellxgene
    - pip  
    - pip:
      - leidenalg==0.8.3
