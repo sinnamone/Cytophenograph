@@ -6,6 +6,7 @@ import sys
 import pandas as pd
 import phenograph as pg
 import scanpy as sc
+import scanpy.external as sce
 import parc
 import umap
 import logging
@@ -124,29 +125,25 @@ class Cytophenograph:
                                 ann_tmp = anndata.AnnData(pandas_df_list[i])
                                 ann_tmp.obs['Sample'] = pandas_df_list[i].index[0][:-2]
                                 #
-                                cell_type = info_file['Cell_type'].loc[info_file['Sample']== pandas_df_list[i].index[0][:-2]]
-                                # ann_tmp.obs['Cell_type'] = cell_type.to_string().split(" ")[-1]
-                                ann_tmp.obs['Cell_type'] = ''.join(e for e in cell_type.to_string() if e.isalnum())
+                                cell_type = info_file['Cell_type'].loc[info_file['Sample'] == pandas_df_list[i].index[0][:-2]]
+                                ann_tmp.obs['Cell_type'] = ''.join(e for e in cell_type.to_string().split(" ")[-1] if e.isalnum())
                                 #
-                                exp = info_file['EXP'].loc[info_file['Sample']== pandas_df_list[i].index[0][:-2]]
-                                # ann_tmp.obs['EXP'] = exp.to_string().split(" ")[-1]
-                                ann_tmp.obs['EXP'] = ''.join(e for e in exp.to_string() if e.isalnum())
+                                exp = info_file['EXP'].loc[info_file['Sample'] == pandas_df_list[i].index[0][:-2]]
+                                ann_tmp.obs['EXP'] = ''.join(e for e in exp.to_string().split(" ")[-1] if e.isalnum())
                                 #
-                                id = info_file['ID'].loc[info_file['Sample']== pandas_df_list[i].index[0][:-2]]
-                                # ann_tmp.obs['ID'] = id.to_string().split(" ")[-1]
-                                ann_tmp.obs['ID'] = ''.join(e for e in id.to_string() if e.isalnum())
+                                id = info_file['ID'].loc[info_file['Sample'] == pandas_df_list[i].index[0][:-2]]
+                                ann_tmp.obs['ID'] = ''.join(e for e in id.to_string().split(" ")[-1] if e.isalnum())
                                 #
                                 time_point = info_file['Time_point'].loc[info_file['Sample'] == pandas_df_list[i].index[0][:-2]]
-                                ann_tmp.obs['Time_point'] = time_point.to_string().split(" ")[-1]
-                                ann_tmp.obs['Time_point'] = ''.join(e for e in time_point.to_string() if e.isalnum())
+                                #ann_tmp.obs['Time_point'] = time_point.to_string().split(" ")[-1]
+                                ann_tmp.obs['Time_point'] = ''.join(e for e in time_point.to_string().split(" ")[-1] if e.isalnum())
                                 #
+
                                 condition = info_file['Condition'].loc[info_file['Sample'] == pandas_df_list[i].index[0][:-2]]
-                                # ann_tmp.obs['Condition'] = condition.to_string().split(" ")[-1]
-                                ann_tmp.obs['Condition'] = ''.join(e for e in condition.to_string() if e.isalnum())
+                                ann_tmp.obs['Condition'] = ''.join(e for e in condition.to_string().split(" ")[-1] if e.isalnum())
                                 #
                                 count = info_file['Count'].loc[info_file['Sample'] == pandas_df_list[i].index[0][:-2]]
-                                # ann_tmp.obs['Count'] = count.to_string().split(" ")[-1]
-                                ann_tmp.obs['Count'] = ''.join(e for e in count.to_string() if e.isalnum())
+                                ann_tmp.obs['Count'] = ''.join(e for e in count.to_string().split(" ")[-1] if e.isalnum())
                                 self.anndata_list.append(ann_tmp)
                             else:
                                 self.log.error("Error, this file {0} is not in the column Sample of Infofile. \n Please check sample name and Infofile".format(pandas_df_list[i].index[0][:-2]))
@@ -159,6 +156,7 @@ class Cytophenograph:
                         else:
                             self.adata = tmp.concatenate(self.anndata_list)
                             self.adata.layers['raw_value'] = self.adata.X
+                            print(self.adata.obs['Condition'])
                     except (ValueError, Exception):
                         self.log.error("Error. Please check Info File Header or CSV header.")
                         sys.exit(1)
@@ -278,9 +276,12 @@ class Cytophenograph:
         self.adata_subset.obs['pheno_leiden'], graph, Q = pg.cluster(self.adata_subset.X, k=int(self.k_coef),
                                            seed=42,
                                            clustering_algo="leiden",
-                                           directed=False,
+                                           directed=True, primary_metric="euclidean", q_tol=0.05,
                                            prune=False, min_cluster_size=1,
                                            n_jobs=int(self.thread))
+        print(type(graph))
+        from scipy import sparse
+        sparse.save_npz("/Users/simone/Desktop/secondmatrix.npz", graph)
         self.adata_subset.obs['pheno_leiden'] = self.adata_subset.obs['pheno_leiden'].astype(int) + 1
         self.adata_subset.obs['pheno_leiden'] = self.adata_subset.obs['pheno_leiden'].astype('category')
         self.adata.obs['cluster'] = self.adata_subset.obs['pheno_leiden']
