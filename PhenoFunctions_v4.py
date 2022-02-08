@@ -41,6 +41,7 @@ class Cytophenograph:
         self.anndata_list = []
         self.log = logging.getLogger()
         self.log.setLevel(logging.INFO)
+        self.harmony = True
         format = logging.Formatter("%(asctime)s %(threadName)-11s %(levelname)-10s %(message)s")
         #
         ch = logging.StreamHandler(sys.stdout)
@@ -259,6 +260,11 @@ class Cytophenograph:
                          show=False,
                          save=".".join(["matrixplot_column_scaled_expression", "pdf"]))
 
+    def run_harmony(self):
+        sc.tl.pca(self.adata_subset)
+        sce.pp.harmony_integrate(self.adata_subset, 'Condition')
+        return self.adata_subset.obsm['X_pca_harmony']
+
     def runphenograph(self):
         """
         Function for execution of phenograph analysis
@@ -279,16 +285,22 @@ class Cytophenograph:
                                            directed=True, primary_metric="euclidean", q_tol=0.05,
                                            prune=False, min_cluster_size=1,
                                            n_jobs=int(self.thread))
-        print(type(graph))
-        from scipy import sparse
-        sparse.save_npz("/Users/simone/Desktop/secondmatrix.npz", graph)
+        #print(type(graph))
+        #from scipy import sparse
+        #sparse.save_npz("/Users/simone/Desktop/secondmatrix.npz", graph)
         self.adata_subset.obs['pheno_leiden'] = self.adata_subset.obs['pheno_leiden'].astype(int) + 1
         self.adata_subset.obs['pheno_leiden'] = self.adata_subset.obs['pheno_leiden'].astype('category')
         self.adata.obs['cluster'] = self.adata_subset.obs['pheno_leiden']
         self.adata.obs['Phenograph_cluster'] = self.adata_subset.obs['pheno_leiden'].astype('category')
-        self.embedding = self.runumap()
-        self.adata.obsm['X_umap'] = self.embedding
-        self.adata_subset.obsm['X_umap'] = self.embedding
+        if self.harmony is True:
+            self.embedding =self.run_harmony()
+            sc.pp.neighbors(self.adata_subset, n_neighbors=10, use_rep='X_pca_harmony')
+            sc.tl.umap(self.adata_subset, min_dist=0.5)
+            self.adata.obsm['X_umap'] = self.adata_subset.obsm['X_umap']
+        else:
+            self.embedding = self.runumap()
+            self.adata.obsm['X_umap'] = self.embedding
+            self.adata_subset.obsm['X_umap'] = self.embedding
         self.tmp_df = pd.DataFrame(self.adata.X, columns=self.adata.var_names)
         self.tmp_df['UMAP_1'] = self.embedding[:, 0]
         self.tmp_df['UMAP_2'] = self.embedding[:, 1]
@@ -323,9 +335,16 @@ class Cytophenograph:
         self.adata_subset.obs['pheno_leiden'] = self.adata_subset.obs['pheno_leiden'].astype('category')
         self.adata.obs['cluster'] = self.adata_subset.obs['pheno_leiden']
         self.adata.obs['Parc_cluster'] = self.adata_subset.obs['pheno_leiden'].astype('category')
-        self.embedding = self.runumap()
-        self.adata.obsm['X_umap'] = self.embedding
-        self.adata_subset.obsm['X_umap'] = self.embedding
+        if self.harmony is True:
+            self.adata_subset = self.run_harmony()
+            sc.pp.neighbors(self.adata_subset, n_neighbors=10, use_rep='X_pca_harmony')
+            sc.tl.umap(self.adata, min_dist=0.5)
+            self.adata.obsm['X_umap'] = self.embedding
+        else:
+            self.embedding = self.runumap()
+            self.adata.obsm['X_umap'] = self.embedding
+            self.adata_subset.obsm['X_umap'] = self.embedding
+
         self.tmp_df = pd.DataFrame(self.adata.X, columns=self.adata.var_names)
         self.tmp_df['UMAP_1'] = self.embedding[:, 0]
         self.tmp_df['UMAP_2'] = self.embedding[:, 1]
