@@ -1,3 +1,6 @@
+.DS_Store
+.gitattributes
+PKG-INFO
 README.md
 setup.cfg
 setup.py
@@ -10,3 +13,7 @@ flowsom/__init__.py
 flowsom/__version__.py
 flowsom/cluster.py
 flowsom/flowsomtool.py
+flowsom/__pycache__/__init__.cpython-36.pyc
+flowsom/__pycache__/__version__.cpython-36.pyc
+flowsom/__pycache__/cluster.cpython-36.pyc
+flowsom/__pycache__/flowsomtool.cpython-36.pyc

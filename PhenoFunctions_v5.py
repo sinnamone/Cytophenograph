@@ -515,6 +515,7 @@ class Cytophenograph:
                              show=False,
                              save=".".join(["matrixplot_column_scaled_expression", self.fileformat]))
         else:
+            self.log.info("Part3: UMAP generation is set to False.  UMAP (Uniform Manifold Approximation and Projection) will be not generate.")
             pass
 
     def runphenograph(self):
