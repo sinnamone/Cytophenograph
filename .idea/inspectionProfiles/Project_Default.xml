@@ -1,0 +1,28 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="15">
+            <item index="0" class="java.lang.String" itemvalue="flowcytometrytools" />
+            <item index="1" class="java.lang.String" itemvalue="scanorama" />
+            <item index="2" class="java.lang.String" itemvalue="setuptools" />
+            <item index="3" class="java.lang.String" itemvalue="scprep" />
+            <item index="4" class="java.lang.String" itemvalue="certifi" />
+            <item index="5" class="java.lang.String" itemvalue="umap-learn" />
+            <item index="6" class="java.lang.String" itemvalue="phate" />
+            <item index="7" class="java.lang.String" itemvalue="tifffile" />
+            <item index="8" class="java.lang.String" itemvalue="h5py" />
+            <item index="9" class="java.lang.String" itemvalue="python-utils" />
+            <item index="10" class="java.lang.String" itemvalue="pyVIA" />
+            <item index="11" class="java.lang.String" itemvalue="igraph" />
+            <item index="12" class="java.lang.String" itemvalue="tasklogger" />
+            <item index="13" class="java.lang.String" itemvalue="dask" />
+            <item index="14" class="java.lang.String" itemvalue="llvmlite" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
