@@ -588,7 +588,7 @@ class Cytophenograph:
             for _ in ['Sample', 'Cell_type', 'EXP', 'ID', 'Time_point', 'Condition']:
                 if len(self.adata_subset.obs[_].unique()) > 1:
                     sc.pl.umap(self.adata_subset, color=_,
-                               cmpa=self.palette, legend_fontoutline=2, show=False, add_outline=False, frameon=False,
+                               cmap=self.palette, legend_fontoutline=2, show=False, add_outline=False, frameon=False,
                                title="UMAP Plot",
                                s=50, save=".".join(["_".join([str(self.tool), _]), "pdf"]))
                 else:
